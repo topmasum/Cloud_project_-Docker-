@@ -8,23 +8,26 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 2. Database Connection
+// 2. Database Connection - FIXED: Changed back to UseNpgsql for PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 3. CORS Policy
+// 3. Register HttpClient for the YouTube feature
+builder.Services.AddHttpClient();
+
+// 4. CORS Policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowNextJS",
-        policy => policy.WithOrigins("http://localhost:3000")
+        policy => policy.WithOrigins("http://localhost:3000", "https://radiance-anyway-dumpster.ngrok-free.dev")
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .AllowCredentials());
 });
 
 var app = builder.Build();
 
-// 4. Configure the HTTP request pipeline
-// Move Swagger to the TOP of the pipeline
+// 5. Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -32,7 +35,6 @@ if (app.Environment.IsDevelopment())
 }
 else 
 {
-    // Ensure Swagger works in "Production" mode too if you need it for your thesis
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
@@ -41,9 +43,12 @@ else
     });
 }
 
-// CRITICAL: Ensure these are in this specific order
-app.UseHttpsRedirection(); // Add this!
+// 6. Middleware Order
+app.UseHttpsRedirection();
+app.UseRouting(); 
+
 app.UseCors("AllowNextJS");
+
 app.UseAuthorization();
 
 app.MapControllers();
