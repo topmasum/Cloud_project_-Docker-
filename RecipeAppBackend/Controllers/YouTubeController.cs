@@ -21,7 +21,7 @@ namespace RecipeAppBackend.Controllers
         public async Task<IActionResult> GetVideo([FromQuery] string query)
         {
             // PRO TIP: In your thesis, mention you'd move this to environment variables for security
-            string apiKey = "YOUR_YOUTUBE_API_KEY"; 
+            string apiKey = "AIzaSyDsdW9VgUmfbmyiu4ABBYp17p04Gee2bCs"; 
             string url = $"https://www.googleapis.com/youtube/v3/search?part=snippet&q={query}+recipe&type=video&key={apiKey}&maxResults=1";
 
             var client = _httpClientFactory.CreateClient();
