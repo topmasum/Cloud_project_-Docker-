@@ -17,7 +17,14 @@ namespace RecipeAppBackend.Data
         {
             base.OnModelCreating(modelBuilder);
             
-            // This ensures your Composite Unique constraint for bookmarks works in the DB
+            // 1. Fix the Recipe -> User Relationship
+            // This tells EF that 'CreatedBy' is the Foreign Key for the 'User' navigation property
+            modelBuilder.Entity<Recipe>()
+                .HasOne(r => r.User)
+                .WithMany() 
+                .HasForeignKey(r => r.CreatedBy);
+
+            // 2. Composite Unique constraint for bookmarks
             modelBuilder.Entity<Bookmark>()
                 .HasIndex(b => new { b.UserId, b.RecipeId })
                 .IsUnique();
